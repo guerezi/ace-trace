@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "Ace Trace",
+    "slug": "ace-trace",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "platforms": ["ios", "android", "web"],
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "assetBundlePatterns": ["**/*"],
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "android": {
+      "package": "com.guerezi.acetrace",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#100010"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.guerezi.acetrace"
+    },
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#100010"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "4bf863ff-28e4-4386-8eb0-31dfc4f0e6b6"
+      }
+    }
+  }
+}

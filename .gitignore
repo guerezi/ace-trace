@@ -1,0 +1,6 @@
+.expo
+/node_modules
+
+.env
+.expo/devices.json
+.expo/README.md
