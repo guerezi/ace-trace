@@ -6,37 +6,13 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal",
-      "env": {
-        "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyCPhq3Qk4yrUphZY5R0OQSKZvSpf1SffX0",
-        "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "acetrace-tennis.firebaseapp.com",
-        "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "acetrace-tennis",
-        "EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET": "acetrace-tennis.firebasestorage.app",
-        "EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "1026629916774",
-        "EXPO_PUBLIC_FIREBASE_APP_ID": "1:1026629916774:web:695bc3336b67c5811235a7"
-      }
+      "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal",
-      "env": {
-        "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyCPhq3Qk4yrUphZY5R0OQSKZvSpf1SffX0",
-        "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "acetrace-tennis.firebaseapp.com",
-        "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "acetrace-tennis",
-        "EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET": "acetrace-tennis.firebasestorage.app",
-        "EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "1026629916774",
-        "EXPO_PUBLIC_FIREBASE_APP_ID": "1:1026629916774:web:695bc3336b67c5811235a7"
-      }
+      "distribution": "internal"
     },
     "production": {
-      "autoIncrement": true,
-      "env": {
-        "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyCPhq3Qk4yrUphZY5R0OQSKZvSpf1SffX0",
-        "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "acetrace-tennis.firebaseapp.com",
-        "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "acetrace-tennis",
-        "EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET": "acetrace-tennis.firebasestorage.app",
-        "EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "1026629916774",
-        "EXPO_PUBLIC_FIREBASE_APP_ID": "1:1026629916774:web:695bc3336b67c5811235a7"
-      }
+      "autoIncrement": true
     }
   },
   "submit": {
