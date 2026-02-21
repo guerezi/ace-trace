@@ -41,6 +41,10 @@ import {
   loadRecentClubs,
   removeRecentClub,
 } from "./src/shared/recentClubsStorage";
+import {
+  loadPreferredColor,
+  savePreferredColor,
+} from "./src/shared/userPreferencesStorage";
 
 type AppView =
   | "landing"
@@ -80,6 +84,7 @@ const AppContent = (): React.JSX.Element => {
   const [refreshFeedKey, setRefreshFeedKey] = useState(0);
   const [pendingDeleteMatch, setPendingDeleteMatch] =
     useState<LiveMatchSummary | null>(null);
+  const [preferredColor, setPreferredColor] = useState<string | null>(null);
   const [lastConfig, setLastConfig] =
     useState<MatchConfig>(DEFAULT_MATCH_CONFIG);
   const [matchState, setMatchState] = useState<MatchState>(() =>
@@ -95,6 +100,48 @@ const AppContent = (): React.JSX.Element => {
 
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    const profileName = authUser?.displayName?.trim();
+    if (!profileName) {
+      return;
+    }
+
+    setLastConfig((previous) =>
+      previous.p1Name === profileName
+        ? previous
+        : {
+          ...previous,
+          p1Name: profileName,
+        }
+    );
+  }, [authUser?.displayName]);
+
+  useEffect(() => {
+    if (!authUser?.uid || authUser.isAnonymous) {
+      setPreferredColor(null);
+      return;
+    }
+
+    loadPreferredColor(authUser.uid)
+      .then((color) => setPreferredColor(color))
+      .catch(() => setPreferredColor(null));
+  }, [authUser?.uid, authUser?.isAnonymous]);
+
+  useEffect(() => {
+    if (!preferredColor) {
+      return;
+    }
+
+    setLastConfig((previous) =>
+      previous.p1Color === preferredColor
+        ? previous
+        : {
+          ...previous,
+          p1Color: preferredColor,
+        }
+    );
+  }, [preferredColor]);
 
   useEffect(() => {
     loadRecentClubs()
@@ -357,7 +404,11 @@ const AppContent = (): React.JSX.Element => {
 
     if (view === "setup") {
       return (
-        <SetupScreen initialConfig={lastConfig} onStartMatch={onStartMatch} />
+        <SetupScreen
+          initialConfig={lastConfig}
+          onStartMatch={onStartMatch}
+          onBack={() => setView("dashboard")}
+        />
       );
     }
 
@@ -428,6 +479,34 @@ const AppContent = (): React.JSX.Element => {
               setOperationError(message);
               throw new Error(message);
             }
+          }}
+          onUpdateDisplayName={async (name) => {
+            try {
+              setOperationError(null);
+              await authGateway.updateDisplayName(name);
+              const normalizedName = name.trim();
+              setLastConfig((previous) => ({
+                ...previous,
+                p1Name: normalizedName || previous.p1Name,
+              }));
+            } catch (error) {
+              const message = mapFirebaseAuthError(error);
+              setOperationError(message);
+              throw new Error(message);
+            }
+          }}
+          preferredColor={preferredColor ?? undefined}
+          onUpdatePreferredColor={async (color) => {
+            if (!authUser?.uid || authUser.isAnonymous) {
+              throw new Error("Sign in to save preferred color.");
+            }
+
+            await savePreferredColor(authUser.uid, color);
+            setPreferredColor(color);
+            setLastConfig((previous) => ({
+              ...previous,
+              p1Color: color,
+            }));
           }}
           onDeleteAccount={async () => {
             try {

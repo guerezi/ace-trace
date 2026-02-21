@@ -4,3 +4,4 @@
 .env
 .expo/devices.json
 .expo/README.md
+.DS_Store

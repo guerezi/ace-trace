@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   signInWithEmailAndPassword: vi.fn(),
   createUserWithEmailAndPassword: vi.fn(),
   sendPasswordResetEmail: vi.fn(),
+  updateProfile: vi.fn(),
   deleteUser: vi.fn(),
   signOutFn: vi.fn(),
   getFirebaseAuthOrNull: vi.fn(),
@@ -17,6 +18,7 @@ vi.mock("firebase/auth", () => ({
   signInWithEmailAndPassword: mocks.signInWithEmailAndPassword,
   createUserWithEmailAndPassword: mocks.createUserWithEmailAndPassword,
   sendPasswordResetEmail: mocks.sendPasswordResetEmail,
+  updateProfile: mocks.updateProfile,
   deleteUser: mocks.deleteUser,
   signOut: mocks.signOutFn,
 }));
@@ -43,6 +45,7 @@ describe("FirebaseAuthGateway", () => {
       uid: "offline-guest",
       isAnonymous: true,
       email: null,
+      displayName: null,
     });
     expect(typeof unsubscribe).toBe("function");
   });
@@ -59,6 +62,7 @@ describe("FirebaseAuthGateway", () => {
     await gateway.signUpWithEmailPassword("new@club.com", "secret");
     await gateway.sendPasswordReset("coach@club.com");
     fakeAuth.currentUser = currentUser;
+    await gateway.updateDisplayName("Gabriel");
     await gateway.deleteCurrentUser();
     await gateway.signOut();
 
@@ -77,6 +81,9 @@ describe("FirebaseAuthGateway", () => {
       fakeAuth,
       "coach@club.com"
     );
+    expect(mocks.updateProfile).toHaveBeenCalledWith(currentUser, {
+      displayName: "Gabriel",
+    });
     expect(mocks.deleteUser).toHaveBeenCalledWith(currentUser);
     expect(mocks.signOutFn).toHaveBeenCalledWith(fakeAuth);
   });

@@ -187,93 +187,48 @@ A feature is done only if:
     2. Add orchestration integration tests for transition/race recovery cases.
     3. Validate deployed Firestore rules and required indexes against live project.
 
-- 2026-02-18 — Iteration log (module resolution cleanup)
+- 2026-02-21 — Checkpoint (project wrap + smartwatch handoff)
 
-  - Done:
-    - Fixed editor/module resolution errors in `MatchScreen` for extracted match components.
-    - Added match components barrel export file at `src/presentation/components/match/index.ts`.
-    - Switched `MatchScreen` imports to use barrel path (`../components/match`) for stable resolution.
-  - Validation:
-    - Problems check for `MatchScreen` now clean.
+  - Project state:
+    - React Native + Expo app is stable and working at repository root (`App.tsx`, `app.json`, `src/`).
+    - Core experience parity is implemented across landing, dashboard, setup, match, spectator, and auth/profile.
+    - Current app branding is set to `Ace Trace` in Expo config.
+
+  - Completed capabilities (high level):
+    - Live scoring flow with singles/doubles support, timeline/history, spectator mode, in-match settings.
+    - Auth flows: sign in/up, reset password, profile, sign out, delete account.
+    - Profile enhancements:
+      - Editable display name synced to Firebase user profile.
+      - Preferred color persisted locally and auto-applied as default `Player 1` color.
+    - Setup UX:
+      - Team/color ordering parity and explicit `Back` + `Start Match` actions.
+    - Firebase/Firestore hardening:
+      - Mixed schema support (`snake_case` + `camelCase`) and ownership guards.
+      - EAS config hardening to avoid committed public env values.
+    - Maintainability improvements:
+      - `MatchScreen` decomposition and match-component barrel exports.
+
+  - Architecture snapshot (for next chat):
+    - `domain/`: pure match rules and entities.
+    - `application/`: gateways + orchestration helpers.
+    - `infrastructure/firebase/`: auth + live sync adapters.
+    - `presentation/`: screens/components.
+    - `App.tsx`: top-level view orchestration/state transitions.
+
+  - Validation baseline:
     - `typecheck` passing.
-  - Missing:
+    - `test` passing (17 tests).
+
+  - Known pending items:
     - Re-auth guidance UX for `requires-recent-login` delete-account flow.
-    - Orchestration integration tests for landing ↔ dashboard ↔ setup transitions.
-    - Firestore deployed rules/index validation in live environment.
-  - Next steps:
-    1. Continue decomposition of other large files (`DashboardScreen`, `AuthScreen`, `MatchSettingsModal`, `TimelineCard`).
-    2. Add re-auth guidance UX for account deletion recent-login requirement.
-    3. Add orchestration integration tests for transition/race recovery cases.
-    4. Validate deployed Firestore rules and required indexes against live project.
+    - App orchestration integration tests for transition/race recovery.
+    - Live environment validation of deployed Firestore rules/indexes.
+    - Device QA for auth persistence and preferred-color persistence across app restarts.
 
-- 2026-02-19 — Iteration log (app naming update)
+  - Smart watch handoff guidance:
+    1. Keep shared scoring logic in `domain/` unchanged and reusable.
+    2. Build watch UI as a new presentation entrypoint focused on quick actions (score/undo/pause, current game/set, server).
+    3. Reuse existing app/gateway contracts for sync; avoid duplicating business rules in watch views.
+    4. Define watch-first navigation states (`live control`, `read-only glance`, `handoff to phone`).
+    5. Start with minimal parity slice: score point + undo + status glance, then expand.
 
-  - Done:
-    - Updated Expo app branding name to `Ace Trace` in app config.
-    - Updated Expo slug to `ace-trace` for consistent project identity.
-  - Validation:
-    - Config update applied successfully.
-  - Missing:
-    - Final decision/confirmation if preferred public name should be `Ace Score` or `Tennis Score` instead.
-    - Re-auth guidance UX for `requires-recent-login` delete-account flow.
-    - Orchestration integration tests for landing ↔ dashboard ↔ setup transitions.
-    - Firestore deployed rules/index validation in live environment.
-  - Next steps:
-    1. Confirm final brand name (`Ace Trace` / `Ace Score` / `Tennis Score`) and adjust config accordingly.
-    2. If needed, align additional metadata/icons/store text to the chosen name.
-    3. Add re-auth guidance UX for account deletion recent-login requirement.
-    4. Add orchestration integration tests for transition/race recovery cases.
-    5. Validate deployed Firestore rules and required indexes against live project.
-
-- 2026-02-19 — Iteration log (android/ios identifiers)
-
-  - Done:
-    - Updated Android application id in app config to `com.guerezi.acetrace`.
-    - Added iOS bundle identifier in app config as `com.guerezi.acetrace` to prepare native iOS builds.
-  - Validation:
-    - Config updates applied successfully in `app.json`.
-  - Missing:
-    - Real-device Android build/install execution (`preview` APK build) not yet run in this iteration.
-    - iOS signing setup (Apple Team/certificates/provisioning) still pending before iOS device/TestFlight installs.
-    - Web deployment target/config (hosting provider + CI/CD) still pending definition.
-  - Next steps:
-    1. Run EAS Android `preview` build and install generated APK on physical device.
-    2. Configure iOS credentials and run EAS iOS build for device/TestFlight.
-    3. Define web deployment target (e.g., Vercel/Netlify/Firebase Hosting) and add deploy pipeline.
-
-- 2026-02-19 — Iteration log (workspace structure update)
-
-  - Done:
-    - Confirmed project structure change: React Native app files are now at repository root.
-    - Confirmed active root now contains runtime/config files directly (`App.tsx`, `app.json`, `package.json`, `src/`).
-    - Noted that the web reference folder remains out for now and can be reintroduced later if needed for parity reference.
-  - Validation:
-    - Workspace root listing matches the new flattened structure.
-  - Missing:
-    - Optional cleanup of any remaining old nested-path mentions in docs/log notes.
-    - Re-auth guidance UX for `requires-recent-login` delete-account flow.
-    - Orchestration integration tests for landing ↔ dashboard ↔ setup transitions.
-    - Firestore deployed rules/index validation in live environment.
-  - Next steps:
-    1. Use repository root as the default base path for all future edits/commands.
-    2. Optionally sweep docs for stale `tennis-score-native-app/` path references.
-    3. Continue parity roadmap items (re-auth UX, orchestration integration tests, Firestore live validation).
-
-- 2026-02-20 — Iteration log (preview/prod Firebase env fix)
-  - Done:
-    - Diagnosed likely root cause for preview/prod failures: `.env` is gitignored and not guaranteed in cloud builds.
-    - Added required `EXPO_PUBLIC_FIREBASE_*` variables to all EAS build profiles (`development`, `preview`, `production`) in `eas.json`.
-    - This ensures Firebase Auth/Firestore config is present in built binaries and web preview bundles.
-  - Validation:
-    - EAS config updated successfully.
-  - Missing:
-    - Rebuild and reinstall preview app to pick up embedded environment values.
-    - Re-auth guidance UX for `requires-recent-login` delete-account flow.
-    - Orchestration integration tests for landing ↔ dashboard ↔ setup transitions.
-    - Firestore deployed rules/index validation in live environment.
-  - Next steps:
-    1. Run a new `preview` build and install it on device.
-    2. Verify login, live matches, and match history against production Firestore project.
-    3. Add re-auth guidance UX for account deletion recent-login requirement.
-    4. Add orchestration integration tests for transition/race recovery cases.
-    5. Validate deployed Firestore rules and required indexes against live project.

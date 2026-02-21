@@ -6,6 +6,7 @@ import {
   signInAnonymously,
   signInWithEmailAndPassword,
   signOut,
+  updateProfile,
 } from "firebase/auth";
 import { AuthGateway, AuthUser } from "../../application/auth/AuthGateway";
 import { getFirebaseAuthOrNull } from "./firebaseClient";
@@ -14,6 +15,7 @@ const buildGuestUser = (): AuthUser => ({
   uid: "offline-guest",
   isAnonymous: true,
   email: null,
+  displayName: null,
 });
 
 export class FirebaseAuthGateway implements AuthGateway {
@@ -34,6 +36,7 @@ export class FirebaseAuthGateway implements AuthGateway {
       callback({
         uid: user.uid,
         email: user.email,
+        displayName: user.displayName,
         isAnonymous: user.isAnonymous,
       });
     });
@@ -48,10 +51,7 @@ export class FirebaseAuthGateway implements AuthGateway {
     await signInAnonymously(auth);
   }
 
-  async signInWithEmailPassword(
-    email: string,
-    password: string
-  ): Promise<void> {
+  async signInWithEmailPassword(email: string, password: string): Promise<void> {
     const auth = getFirebaseAuthOrNull();
     if (!auth) {
       return;
@@ -60,16 +60,25 @@ export class FirebaseAuthGateway implements AuthGateway {
     await signInWithEmailAndPassword(auth, email, password);
   }
 
-  async signUpWithEmailPassword(
-    email: string,
-    password: string
-  ): Promise<void> {
+  async signUpWithEmailPassword(email: string, password: string): Promise<void> {
     const auth = getFirebaseAuthOrNull();
     if (!auth) {
       return;
     }
 
     await createUserWithEmailAndPassword(auth, email, password);
+  }
+
+  async updateDisplayName(name: string): Promise<void> {
+    const auth = getFirebaseAuthOrNull();
+    if (!auth || !auth.currentUser) {
+      return;
+    }
+
+    const trimmedName = name.trim();
+    await updateProfile(auth.currentUser, {
+      displayName: trimmedName.length > 0 ? trimmedName : null,
+    });
   }
 
   async sendPasswordReset(email: string): Promise<void> {

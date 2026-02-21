@@ -20,9 +20,7 @@ const hasConfig =
 
 let appInstance: ReturnType<typeof initializeApp> | null = null;
 let authInstance: ReturnType<typeof getAuth> | null = null;
-let reactNativePersistenceFactory:
-  | ((storage: typeof AsyncStorage) => unknown)
-  | null = null;
+let reactNativePersistenceFactory: ((storage: typeof AsyncStorage) => unknown) | null = null;
 
 const getReactNativePersistenceFactory = () => {
   if (reactNativePersistenceFactory) {
@@ -30,11 +28,11 @@ const getReactNativePersistenceFactory = () => {
   }
 
   try {
-    const rnAuth = require("@firebase/auth/dist/rn/index.js") as {
+    const authModule = require("firebase/auth") as {
       getReactNativePersistence?: (storage: typeof AsyncStorage) => unknown;
     };
 
-    reactNativePersistenceFactory = rnAuth.getReactNativePersistence ?? null;
+    reactNativePersistenceFactory = authModule.getReactNativePersistence ?? null;
     return reactNativePersistenceFactory;
   } catch {
     return null;

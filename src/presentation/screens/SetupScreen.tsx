@@ -19,11 +19,13 @@ import { PrimaryButton } from "../components/PrimaryButton";
 interface SetupScreenProps {
   initialConfig: MatchConfig;
   onStartMatch: (config: MatchConfig) => void;
+  onBack: () => void;
 }
 
 export const SetupScreen: React.FC<SetupScreenProps> = ({
   initialConfig,
   onStartMatch,
+  onBack,
 }) => {
   const isDark = useColorScheme() === "dark";
   const [config, setConfig] = useState<MatchConfig>({
@@ -147,9 +149,8 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({
                       : null,
                   ]}
                   accessibilityRole="button"
-                  accessibilityLabel={`${
-                    config.mode === "doubles" ? "Team 1" : "Player 1"
-                  } color ${option.label}`}
+                  accessibilityLabel={`${config.mode === "doubles" ? "Team 1" : "Player 1"
+                    } color ${option.label}`}
                 />
               );
             })}
@@ -218,9 +219,8 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({
                       : null,
                   ]}
                   accessibilityRole="button"
-                  accessibilityLabel={`${
-                    config.mode === "doubles" ? "Team 2" : "Player 2"
-                  } color ${option.label}`}
+                  accessibilityLabel={`${config.mode === "doubles" ? "Team 2" : "Player 2"
+                    } color ${option.label}`}
                 />
               );
             })}
@@ -357,11 +357,19 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({
           </View>
         </View>
 
-        <PrimaryButton
-          label="Start Match"
-          onPress={() => onStartMatch(config)}
-          disabled={!canStart}
-        />
+        <View style={styles.actionsRow}>
+          <PrimaryButton
+            label="Back"
+            onPress={onBack}
+            style={styles.backAction}
+          />
+          <PrimaryButton
+            label="Start Match"
+            onPress={() => onStartMatch(config)}
+            disabled={!canStart}
+            style={styles.startAction}
+          />
+        </View>
       </View>
     </ScrollView>
   );
@@ -508,5 +516,16 @@ const styles = StyleSheet.create({
   },
   teamDividerDark: {
     backgroundColor: "#4C3D76",
+  },
+  actionsRow: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  backAction: {
+    backgroundColor: "#64748B",
+    flex: 1,
+  },
+  startAction: {
+    flex: 1,
   },
 });

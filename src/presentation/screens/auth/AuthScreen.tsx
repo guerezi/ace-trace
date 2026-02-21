@@ -9,6 +9,11 @@ import {
   useColorScheme,
 } from "react-native";
 import { AuthUser } from "../../../application/auth/AuthGateway";
+import {
+  PLAYER_COLOR_OPTIONS,
+  PlayerColorKey,
+  normalizePlayerColorKey,
+} from "../../../shared/playerColors";
 import { PrimaryButton } from "../../components/PrimaryButton";
 
 type AuthMode = "login" | "signup" | "forgot-password" | "profile";
@@ -27,6 +32,9 @@ interface AuthScreenProps {
   onLogin: (email: string, password: string) => Promise<void>;
   onSignup: (email: string, password: string) => Promise<void>;
   onResetPassword: (email: string) => Promise<void>;
+  onUpdateDisplayName: (name: string) => Promise<void>;
+  preferredColor?: string;
+  onUpdatePreferredColor: (color: PlayerColorKey) => Promise<void>;
   onDeleteAccount: () => Promise<void>;
   onLogout: () => Promise<void>;
 }
@@ -38,6 +46,9 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
   onLogin,
   onSignup,
   onResetPassword,
+  onUpdateDisplayName,
+  preferredColor,
+  onUpdatePreferredColor,
   onDeleteAccount,
   onLogout,
 }) => {
@@ -47,8 +58,19 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
   );
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [displayName, setDisplayName] = useState(user?.displayName ?? "");
+  const [preferredColorDraft, setPreferredColorDraft] =
+    useState<PlayerColorKey>(normalizePlayerColorKey(preferredColor, "blue"));
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    setDisplayName(user?.displayName ?? "");
+  }, [user?.displayName]);
+
+  React.useEffect(() => {
+    setPreferredColorDraft(normalizePlayerColorKey(preferredColor, "blue"));
+  }, [preferredColor]);
 
   const handleLogin = async () => {
     try {
@@ -126,6 +148,36 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
     }
   };
 
+  const handleSaveDisplayName = async () => {
+    try {
+      setError(null);
+      setMessage(null);
+      await onUpdateDisplayName(displayName);
+      setMessage("Name updated successfully.");
+    } catch (error) {
+      const message =
+        error instanceof Error && error.message
+          ? error.message
+          : "Unable to update name.";
+      setError(message);
+    }
+  };
+
+  const handleSavePreferredColor = async () => {
+    try {
+      setError(null);
+      setMessage(null);
+      await onUpdatePreferredColor(preferredColorDraft);
+      setMessage("Preferred color updated successfully.");
+    } catch (error) {
+      const message =
+        error instanceof Error && error.message
+          ? error.message
+          : "Unable to update preferred color.";
+      setError(message);
+    }
+  };
+
   if (mode === "profile") {
     return (
       <View style={[styles.container, isDark ? styles.containerDark : null]}>
@@ -141,6 +193,51 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
             </Text>
 
             <View style={[styles.card, isDark ? styles.cardDark : null]}>
+              <Text style={[styles.label, isDark ? styles.labelDark : null]}>
+                Player Name
+              </Text>
+              <TextInput
+                style={[styles.input, isDark ? styles.inputDark : null]}
+                value={displayName}
+                onChangeText={setDisplayName}
+                placeholder="Your name"
+                placeholderTextColor={isDark ? "#A78BFA" : "#64748B"}
+              />
+              <PrimaryButton
+                label="Save Name"
+                onPress={handleSaveDisplayName}
+                style={styles.secondaryAction}
+              />
+
+              <Text style={[styles.label, isDark ? styles.labelDark : null]}>
+                Preferred Color
+              </Text>
+              <View style={styles.colorPickerRow}>
+                {PLAYER_COLOR_OPTIONS.map((option) => {
+                  const isSelected = preferredColorDraft === option.key;
+
+                  return (
+                    <Pressable
+                      key={`preferred-color-${option.key}`}
+                      onPress={() => setPreferredColorDraft(option.key)}
+                      style={[
+                        styles.colorOption,
+                        { backgroundColor: option.solid },
+                        isSelected ? styles.colorOptionSelected : null,
+                        isDark && isSelected ? styles.colorOptionSelectedDark : null,
+                      ]}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Preferred color ${option.label}`}
+                    />
+                  );
+                })}
+              </View>
+              <PrimaryButton
+                label="Save Preferred Color"
+                onPress={handleSavePreferredColor}
+                style={styles.secondaryAction}
+              />
+
               <Text style={[styles.label, isDark ? styles.labelDark : null]}>
                 Your Match History
               </Text>
@@ -618,5 +715,25 @@ const styles = StyleSheet.create({
   },
   backAction: {
     backgroundColor: "#475569",
+  },
+  colorPickerRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginBottom: 4,
+    marginTop: -1,
+  },
+  colorOption: {
+    borderColor: "transparent",
+    borderRadius: 999,
+    borderWidth: 2,
+    height: 22,
+    width: 22,
+  },
+  colorOptionSelected: {
+    borderColor: "#0F172A",
+  },
+  colorOptionSelectedDark: {
+    borderColor: "#F5F3FF",
   },
 });
